@@ -164,7 +164,7 @@ def parse_opts():
         action='store_true',
         help='If true, SyncBatchNorm is used instead of BatchNorm.')
     parser.add_argument('--n_epochs',
-                        default=200,
+                        default=100,
                         type=int,
                         help='Number of total epochs to run')
     parser.add_argument('--n_val_samples',

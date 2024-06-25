@@ -78,7 +78,7 @@ def inference(data_loader, model, result_path, class_names, no_average,
                                            class_names, output_topk)
                 inference_results['results'][video_id].append({
                     'segment': segment,
-                    'result': result
+                    'results': result
                 })
 
     with result_path.open('w') as f:

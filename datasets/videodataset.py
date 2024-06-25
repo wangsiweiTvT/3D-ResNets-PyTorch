@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 import torch
@@ -88,10 +89,11 @@ class VideoDataset(data.Dataset):
                 label_id = -1
 
             video_path = video_paths[i]
-            if not video_path.exists():
+            if not(video_path.exists() and len(list(os.scandir(video_path)))>0):
                 continue
-
+            # print(video_path)
             segment = annotations[i]['segment']
+
             if segment[1] == 1:
                 continue
 

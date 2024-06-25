@@ -1,9 +1,13 @@
 import subprocess
 import argparse
 from pathlib import Path
+import os
+import datetime
+
 
 from joblib import Parallel, delayed
 
+num = 0
 
 def video_process(video_file_path, dst_root_path, ext, fps=-1, size=240):
     if ext != video_file_path.suffix:
@@ -23,10 +27,17 @@ def video_process(video_file_path, dst_root_path, ext, fps=-1, size=240):
     frame_rate = frame_rate[0] / frame_rate[1]
     duration = float(res[3])
     n_frames = int(frame_rate * duration)
-
     name = video_file_path.stem
     dst_dir_path = dst_root_path / name
     dst_dir_path.mkdir(exist_ok=True)
+    current_time = datetime.datetime.now()
+    global num
+    num=num+1
+    print(num,'=',current_time)
+
+    if len(os.listdir(dst_dir_path))>0:
+        print(dst_dir_path,'has transfered')
+        return
     n_exist_frames = len([
         x for x in dst_dir_path.iterdir()
         if x.suffix == '.jpg' and x.name[0] != '.'
@@ -77,7 +88,7 @@ if __name__ == '__main__':
         'dataset',
         default='',
         type=str,
-        help='Dataset name (kinetics | mit | ucf101 | hmdb51 | activitynet)')
+        help='Dataset name (kinetics | mit | ucf101 | hmdb51 | activitynet|xingluo)')
     parser.add_argument(
         '--n_jobs', default=-1, type=int, help='Number of parallel jobs')
     parser.add_argument(
@@ -90,7 +101,7 @@ if __name__ == '__main__':
         '--size', default=240, type=int, help='Frame size of output videos.')
     args = parser.parse_args()
 
-    if args.dataset in ['kinetics', 'mit', 'activitynet']:
+    if args.dataset in ['kinetics', 'mit', 'activitynet','xingluo']:
         ext = '.mp4'
     else:
         ext = '.avi'
@@ -103,6 +114,7 @@ if __name__ == '__main__':
                 video_file_path, args.dst_path, ext, args.fps, args.size)
                                  for video_file_path in video_file_paths)
     else:
+        #创建分类名  文件夹名
         class_dir_paths = [x for x in sorted(args.dir_path.iterdir())]
         test_set_video_path = args.dir_path / 'test'
         if test_set_video_path.exists():
@@ -113,3 +125,6 @@ if __name__ == '__main__':
             backend='threading')(delayed(class_process)(
                 class_dir_path, args.dst_path, ext, args.fps, args.size)
                                  for class_dir_path in class_dir_paths)
+
+
+# ffmpeg -i E:\\workspace_pycharm\\ActivityNet\\Crawler\\Kinetics\\xlvideo\\两支展示\\1fd8d884a9d5c3589a5570d7f104b71a.mp4 -vf scale=240:-1 -threads 1 F:\\datasets\\jpgs\\两支展示\\1fd8d884a9d5c3589a5570d7f104b71a/image_%05d.jpg
